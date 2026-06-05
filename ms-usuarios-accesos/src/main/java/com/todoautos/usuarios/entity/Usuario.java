@@ -1,6 +1,6 @@
 package com.todoautos.usuarios.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,22 +10,25 @@ import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idUsuario;
     private String nombreUsuario;
     private String contraseñaUsuario;
 
-    // USUARIO TIENE UNA RELACION MUCHOS A UNO CON SU PADRE ROL
+    // UN USUARIO TIENE UN ÚNICO ROL (Muchos a Uno)
     @ManyToOne
-    @JoinColumn(name = "idRol")//creamos la columna fisica, normalmente le pnemos elmismo nombre del dato id de la otra tabla
-    @JsonManagedReference("usuario-rol")
-    private Rol rol;//instanciamos a la tabla rol
+    @JoinColumn(name = "id_rol") // Crea la FK id_rol físicamente en la tabla Usuario
+    @JsonIgnoreProperties("usuarios") // Evita el bucle infinito en Jackson
+    private Rol rol; // Un solo objeto Rol, no una lista
 
     public Usuario() {
         this.nombreUsuario = "";
         this.contraseñaUsuario = "";
     }
+
+    // --- GETTERS Y SETTERS ---
 
     public Integer getIdUsuario() {
         return idUsuario;
@@ -49,5 +52,13 @@ public class Usuario {
 
     public void setContraseñaUsuario(String contraseñaUsuario) {
         this.contraseñaUsuario = contraseñaUsuario;
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 }

@@ -1,11 +1,13 @@
 package com.todoautos.usuarios.entity;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
 import jakarta.persistence.ManyToMany;
 
 @Entity
@@ -19,8 +21,8 @@ public class Permiso {
 
     //RELACION MUCHOS A MUCHOS CON ROL
     @ManyToMany(mappedBy = "permisos")//<-- permisos es el nombre que le pondre a la lista en la clase rol
-    @JsonBackReference("rol-permiso") // <-- Se le agrega el identificador que define la tabla intermedia implicita
-    private List<Rol> roles;// esta lista contendra la lista de roles
+    @JsonIgnoreProperties("permisos")
+    private List<Rol> roles= new ArrayList<>();// esta lista contendra la lista de roles
 
     public Permiso() {
         this.nombrePermiso = "";

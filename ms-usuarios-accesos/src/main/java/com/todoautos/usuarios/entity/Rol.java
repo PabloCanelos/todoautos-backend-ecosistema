@@ -1,7 +1,8 @@
 package com.todoautos.usuarios.entity;
+
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,34 +14,37 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 public class Rol {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idRol;
     private String nombreRol;
 
-
-    //relcion con usuario, un rol puede pertenecer a muchos usuarios, pero cada usuario solo un rol
+    // RELACIÓN UNO A MUCHOS CON USUARIO (Un rol, muchos usuarios)
+    // El espejo 'mappedBy' apunta al atributo 'rol' de la clase Usuario
     @OneToMany(mappedBy = "rol")
+    @JsonIgnoreProperties("rol")
     private List<Usuario> usuarios = new ArrayList<>();
 
-     // rol tiene una relacion many to many con permiso
-     //esta seria la tabla principal la que abre la relacion, una debe tener el control
+    // RELACIÓN MUCHOS A MUCHOS CON PERMISO
+    // Esta es la entidad principal que es dueña de la relación con Permiso
     @ManyToMany
     @JoinTable(
-        // defino un nombre para la tabla intermedia(implicita) de la relacion,
-         // esta tabla se creara automaticamente en la base de datos
-         name = "PermisoRol",
-         joinColumns = @JoinColumn(name = "idRol"),//(hago el join con el id de la entidad principal que seria esta misma )
-         inverseJoinColumns = @JoinColumn(name = "idPermiso")// inverse join argumento id de la entidad //relacionada
-     )
-    @JsonManagedReference("rol-permiso") // <-- Se vincula con el mismo nombre de Permiso
-    private List<Permiso> permisos;//esta lista creada servira para alimentar de informacion a la tabla relacionada
+        name = "PermisoRol", // Nombre de la tabla intermedia implícita en MySQL
+        joinColumns = @JoinColumn(name = "idRol"), // FK de esta entidad principal (Rol)
+        inverseJoinColumns = @JoinColumn(name = "idPermiso") // FK de la entidad relacionada (Permiso)
+    )
+    @JsonIgnoreProperties("roles") // Evita el bucle infinito de Jackson
+    private List<Permiso> permisos = new ArrayList<>(); // Alimenta de información a la tabla relacionada
 
-
+    // Constructor Vacío Profesional
     public Rol() {
         this.nombreRol = "";
         this.permisos = new ArrayList<>();
+        this.usuarios = new ArrayList<>();
     }
+
+    // --- GETTERS Y SETTERS ---
 
     public Integer getIdRol() {
         return idRol;
