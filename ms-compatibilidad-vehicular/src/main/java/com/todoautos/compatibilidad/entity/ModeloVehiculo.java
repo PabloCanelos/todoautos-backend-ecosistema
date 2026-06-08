@@ -1,11 +1,19 @@
 package com.todoautos.compatibilidad.entity;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-// import jakarta.persistence.JoinColumn;
-// import jakarta.persistence.ManyToOne;
-// import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 @Entity
 public class ModeloVehiculo {
     @Id
@@ -15,20 +23,23 @@ public class ModeloVehiculo {
 
 
     //modelo vehiculo es hijo de MARCA-VEHICULO
-    // @ManyToOne
-    // @JoinColumn(name = "idMarcaVehiculo")
-    // @JsonBackReference
-    // private MarcaVehiculo marcaVehiculo;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "idMarcaVehiculo", nullable = false)
+    @JsonBackReference
+    private MarcaVehiculo marcaVehiculo;
+
+    //METODO HELPER PARA INTEGRIDAD
 
 
     // //modelo vehiculo es padre de version motor
-    // @OneToMany(mappedBy = "modeloVehiculo")
-    // @JsonManagedReference
-    // private List<VersionMotor> versionesMotor;
-    //     public ModeloVehiculo() {
-    //         this.nombreModeloVehiculo="";
-    //         this.versionesMotor = new ArrayList<>();
-    //     }
+    @OneToMany(mappedBy = "modeloVehiculo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<VersionMotor> versionesMotor= new ArrayList<>();
+
+    public ModeloVehiculo() {
+         this.nombreModeloVehiculo="";
+        this.versionesMotor = new ArrayList<>();
+        }
 
 
     public Integer getIdModeloVehiculo() {
@@ -46,6 +57,33 @@ public class ModeloVehiculo {
     public void setNombreModeloVehiculo(String nombreModeloVehiculo) {
         this.nombreModeloVehiculo = nombreModeloVehiculo;
     }
+
+
+    public MarcaVehiculo getMarcaVehiculo() {
+        return marcaVehiculo;
+    }
+
+
+    public void setMarcaVehiculo(MarcaVehiculo marcaVehiculo) {
+        this.marcaVehiculo = marcaVehiculo;
+    }
+
+
+    public List<VersionMotor> getVersionesMotor() {
+        return versionesMotor;
+    }
+
+
+    public void setVersionesMotor(List<VersionMotor> versionesMotor) {
+        this.versionesMotor = versionesMotor;
+    }
+
+     // MÉTODO HELPER para Versiones
+    public void addVersionMotor(VersionMotor version) {
+        this.versionesMotor.add(version);
+        version.setModeloVehiculo(this);
+    }
+
 
 
 }

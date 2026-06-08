@@ -14,15 +14,11 @@ public class ConfiguracionStockEntity {
     private Integer stockMaximo;
     private String observaciones;
 
-    //private Integer repuestoId;
-
 
     public ConfiguracionStockEntity() {
         this.stockMinimo =0;
         this.stockMaximo =0;
         this.observaciones ="";
-        //this.repuestoId = 0;
-
     }
 
 

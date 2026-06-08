@@ -1,12 +1,13 @@
 package com.todoautos.catalogo.entity;
 
-//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-// import jakarta.persistence.JoinColumn;
-// import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Repuesto {
@@ -19,10 +20,11 @@ public class Repuesto {
     private Integer cantidadRepuesto;
 
     // Relación: Muchos repuestos pertenecen a una categoría
-    // @ManyToOne
-    // @JoinColumn(name="idCategoria")
-    // @JsonIgnoreProperties("repuestos")
-    // private CategoriaRepuesto categoria;
+    // Agregar fetch = FetchType.LAZY para evitar cargar la categoría siempre
+    @ManyToOne(fetch =  FetchType.LAZY)
+    @JoinColumn(name="idCategoria", nullable = false)// Obliga a que siempre haya una categoría
+    @JsonIgnoreProperties("repuestos")
+    private CategoriaRepuesto categoria;
 
     public Repuesto() {
         this.nombreRepuesto = "";
@@ -71,11 +73,11 @@ public class Repuesto {
         this.cantidadRepuesto = cantidadRepuesto;
     }
 
-    // public CategoriaRepuesto getCategoria() {
-    //     return categoria;
-    // }
+    public CategoriaRepuesto getCategoria() {
+        return categoria;
+    }
 
-    // public void setCategoria(CategoriaRepuesto categoria) {
-    //     this.categoria = categoria;
-    // }
+    public void setCategoria(CategoriaRepuesto categoria) {
+        this.categoria = categoria;
+    }
 }

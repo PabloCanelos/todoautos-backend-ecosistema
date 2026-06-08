@@ -1,12 +1,11 @@
 package com.todoautos.compatibilidad.entity;
-//import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-// import jakarta.persistence.JoinColumn;
-// import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Compatibilidad {
@@ -21,10 +20,9 @@ public class Compatibilidad {
 
 
     // //relacion vrsion motor hija de compatibilidad
-    // @ManyToOne
-    // @JoinColumn(name = "idVersionMotor")
-    // @JsonBackReference
-    // private VersionMotor versionMotor;
+    @ManyToOne(fetch= FetchType.LAZY)
+    @JoinColumn(name = "idVersionMotor", nullable = false)
+    private VersionMotor versionMotor;
 
 
     public Compatibilidad() {
@@ -75,9 +73,13 @@ public class Compatibilidad {
         this.repuestoId = repuestoId;
     }
 
+    public VersionMotor getVersionMotor() {
+        return versionMotor;
+    }
 
-
-
+    public void setVersionMotor(VersionMotor versionMotor) {
+        this.versionMotor = versionMotor;
+    }
 
 
 
