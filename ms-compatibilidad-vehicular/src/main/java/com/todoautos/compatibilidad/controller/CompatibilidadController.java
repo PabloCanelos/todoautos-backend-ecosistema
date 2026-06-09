@@ -23,7 +23,7 @@ public class CompatibilidadController {
             List<Compatibilidad> lista = compatibilidadService.listarTodo();
             return ResponseEntity.ok(lista);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
@@ -39,7 +39,7 @@ public class CompatibilidadController {
     }
 
     // 3. REGISTRAR (Con validación de microservicio externo)
-    
+
     @PostMapping("/crear")
     public ResponseEntity<?> crear(@RequestBody Compatibilidad compatibilidad) {
         try {

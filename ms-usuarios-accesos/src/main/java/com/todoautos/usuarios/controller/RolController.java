@@ -3,6 +3,8 @@ package com.todoautos.usuarios.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,38 +20,59 @@ import com.todoautos.usuarios.service.RolService;
 @RestController
 @RequestMapping("/api/roles")
 public class RolController {
+
     @Autowired
     private RolService rolService;
 
-    //creacion de rol
-    @PostMapping
-    public Rol crearRol(@RequestBody Rol rol){
-        return rolService.crearRol(rol);
-
+    // POST /api/roles
+    @PostMapping("/crear")
+    public ResponseEntity<Rol> crearRol(@RequestBody Rol rol) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(rolService.crearRol(rol));
     }
 
-    //listar roles
+    // GET /api/roles
+    // GET /api/roles/listar
     @GetMapping("/listar")
-    public List<Rol>listarRoles(){
-        return rolService.listarRoles();
+    public ResponseEntity<?> listarRoles() {
+        try {
+            List<Rol> lista = rolService.listarRoles();
+            return ResponseEntity.ok(lista);
+        } catch (RuntimeException e) {
+            // Devolvemos 404 Not Found si la lista está vacía
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
-    //buscar rol por su id
-    @GetMapping("/{id}")
-    public Rol buscarPorId(@PathVariable Integer id){
-        return rolService.buscarPorId(id);
-
-    }
-    //eliminarun rol
-    @DeleteMapping("/{id}")
-    public void eliminarRol(@PathVariable Integer id){
-        rolService.eliminarRol(id);
-
-    }
-    @PutMapping("/actualizar")
-    public Rol actualizar(@RequestBody Rol rol) {
-        return rolService.actualizarRol(rol);
+    // GET /api/roles/1
+    // GET /api/roles/1
+    @GetMapping("/buscar/{id}")
+    public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
+        try {
+            Rol rol = rolService.buscarPorId(id);
+            return ResponseEntity.ok(rol);
+        } catch (RuntimeException e) {
+            // Capturamos el error del Service y devolvemos un 404 claro
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
+    // DELETE /api/roles/1
+    // DELETE /api/roles/1
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<?> eliminarRol(@PathVariable Integer id) {
+        try {
+            rolService.eliminarRol(id);
+            return ResponseEntity.noContent().build(); // HTTP 204: Éxito sin cuerpo
+        } catch (RuntimeException e) {
+            // Capturamos el mensaje del Service y devolvemos 404
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 
+    // PUT /api/roles/1
+    @PutMapping("/{id}")
+    public ResponseEntity<Rol> actualizar(@PathVariable Integer id, @RequestBody Rol rol) {
+        rol.setIdRol(id); // Asegura consistencia
+        return ResponseEntity.ok(rolService.actualizarRol(rol));
+    }
 }

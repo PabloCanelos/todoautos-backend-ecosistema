@@ -25,7 +25,7 @@ public class ModeloVehiculo {
     //modelo vehiculo es hijo de MARCA-VEHICULO
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "idMarcaVehiculo", nullable = false)
-    @JsonBackReference
+    @JsonBackReference(value = "marca-modelo")
     private MarcaVehiculo marcaVehiculo;
 
     //METODO HELPER PARA INTEGRIDAD
@@ -33,7 +33,7 @@ public class ModeloVehiculo {
 
     // //modelo vehiculo es padre de version motor
     @OneToMany(mappedBy = "modeloVehiculo", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference(value = "modelo-version")
     private List<VersionMotor> versionesMotor= new ArrayList<>();
 
     public ModeloVehiculo() {

@@ -1,7 +1,7 @@
 package com.todoautos.usuarios.service;
 
 import java.util.List;
-import java.util.Optional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,67 +11,88 @@ import com.todoautos.usuarios.repository.PermisoRepository;
 import com.todoautos.usuarios.util.utilValidaciones.DataValidator;
 
 @Service
-public class PermisoService  {
+public class PermisoService {
+
     @Autowired
     public PermisoRepository permisoRepository;
 
-    //importacion de la clase validator
     @Autowired
     private DataValidator validator;
 
+    // --- MÉTODOS DE CREACIÓN Y ACTUALIZACIÓN ---
 
-    //permiso se reutilizara como metodo para crear
     public Permiso crearPermiso(Permiso permiso) {
-    if (permiso == null) {
-        throw new RuntimeException("El objeto no existe, o es nulo");
-    }
+        if (permiso == null) throw new RuntimeException("El objeto no existe, o es nulo");
 
-    // 1. Limpieza inicial de espacios fantasmas
-    if (permiso.getNombrePermiso() != null) permiso.setNombrePermiso(permiso.getNombrePermiso().trim());
-    if (permiso.getDescripcionPermiso() != null) permiso.setDescripcionPermiso(permiso.getDescripcionPermiso().trim());
-
-    // 2. Delegamos las validaciones pesadas a la herramienta genérica
+        limpiarDatos(permiso);
         validator.validateFormatName(permiso.getNombrePermiso(), "Nombre del Permiso");
         validator.validateDescription(permiso.getDescripcionPermiso(), 10, 255);
 
-    // 3. Validación de duplicidad en base de datos
-    Optional<Permiso> permisoExistente = permisoRepository.findByNombrePermiso(permiso.getNombrePermiso());
-    if (permisoExistente.isPresent()) {
-        throw new RuntimeException("Error: El permiso '" + permiso.getNombrePermiso() + "' ya existe.");
-    }
-
-    return permisoRepository.save(permiso);
-}
-
-
-
-
-    // Listar todos los permisos disponibles para que Sergio y Marcelo los vean en el front
-    public List<Permiso> listarPermisos() {
-        return permisoRepository.findAll();
-    }
-
-    // Buscar un permiso por su ID para validaciones
-    public Permiso buscarPorId(Integer id) {
-        if(id == null){
-            throw new RuntimeException("Error: El id ingresado no existe");
+        if (permisoRepository.findByNombrePermiso(permiso.getNombrePermiso()).isPresent()) {
+            throw new RuntimeException("Error: El permiso '" + permiso.getNombrePermiso() + "' ya existe.");
         }
-        return permisoRepository.findById(id).orElse(null);
-    }
 
-    // Eliminar un permiso si ya no es necesario en el microservicio
-    public void eliminarPermiso(Integer id) {
-        if(id== null){
-            throw new RuntimeException("Error: ID no encontrado");
-        }
-        permisoRepository.deleteById(id);
-    }
-    // Método para actualizar permiso (se usa el ID que viene en el objeto)
-    public Permiso actualizarPermiso(Permiso permiso) {
-        if(permiso == null){
-            throw new RuntimeException("NO hay nada para actualizar , base de datos esta vacia");
-        }
         return permisoRepository.save(permiso);
     }
 
+    public Permiso actualizarPermiso(Permiso permiso) {
+        if (permiso == null || permiso.getIdPermiso() == null) {
+            throw new RuntimeException("El permiso o su ID no pueden ser nulos");
+        }
+
+        Permiso existente = permisoRepository.findById(permiso.getIdPermiso())
+            .orElseThrow(() -> new RuntimeException("No se encontró el permiso con ID: " + permiso.getIdPermiso()));
+
+        limpiarDatos(permiso);
+        validator.validateFormatName(permiso.getNombrePermiso(), "Nombre del Permiso");
+        validator.validateDescription(permiso.getDescripcionPermiso(), 10, 255);
+
+        if (!existente.getNombrePermiso().equalsIgnoreCase(permiso.getNombrePermiso())) {
+            if (permisoRepository.findByNombrePermiso(permiso.getNombrePermiso()).isPresent()) {
+                throw new RuntimeException("Error: Ya existe otro permiso con el nombre '" + permiso.getNombrePermiso() + "'.");
+            }
+        }
+
+        existente.setNombrePermiso(permiso.getNombrePermiso());
+        existente.setDescripcionPermiso(permiso.getDescripcionPermiso());
+
+        return permisoRepository.save(existente);
+    }
+
+    // --- MÉTODOS DE LECTURA ---
+
+    public Permiso buscarPorId(Integer id) {
+        if (id == null || id <= 0) {
+            throw new RuntimeException("Error: El ID del permiso no es válido.");
+        }
+        return permisoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Error: Permiso con ID " + id + " no encontrado."));
+    }
+
+    public List<Permiso> listarPermisos() {
+        List<Permiso> lista = permisoRepository.findAll();
+        if (lista.isEmpty()) {
+            throw new RuntimeException("No hay permisos registrados en el sistema.");
+        }
+        return lista;
+    }
+
+    // --- MÉTODO DE ELIMINACIÓN ---
+
+    public void eliminarPermiso(Integer id) {
+        if (id == null || id <= 0) {
+            throw new RuntimeException("Error: El ID para eliminar no es válido.");
+        }
+        if (!permisoRepository.existsById(id)) {
+            throw new RuntimeException("Error: No se pudo eliminar, el permiso con ID " + id + " no existe.");
+        }
+        permisoRepository.deleteById(id);
+    }
+
+    // --- MÉTODO AUXILIAR ---
+
+    private void limpiarDatos(Permiso p) {
+        if (p.getNombrePermiso() != null) p.setNombrePermiso(p.getNombrePermiso().trim());
+        if (p.getDescripcionPermiso() != null) p.setDescripcionPermiso(p.getDescripcionPermiso().trim());
+    }
 }

@@ -1,5 +1,5 @@
 package com.todoautos.usuarios.controller;
-import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,63 +16,60 @@ import com.todoautos.usuarios.entity.Permiso;
 import com.todoautos.usuarios.service.PermisoService;
 
 @RestController
-@RequestMapping("api/permisos")
+@RequestMapping("/api/permisos")
 public class PermisoController {
+
     @Autowired
     private PermisoService permisoService;
 
-    // Crear nuevo permiso
-    // Crear nuevo permiso con estándar RESTful y manejo defensivo de errores
-    @PostMapping("/crear") // Puedes mantener el "/crear" si así lo exige tu rúbrica, o dejarlo vacío si usas la URL base
-    public ResponseEntity<?> createPermission(@RequestBody Permiso permission) {
+    // CREAR
+    @PostMapping("/crear")
+    public ResponseEntity<?> crear(@RequestBody Permiso permiso) {
         try {
-            // Ejecutamos tu servicio blindado
-            Permiso nuevoPermiso = permisoService.crearPermiso(permission);
-
-            // ÉXITO: Retornamos el HTTP 201 Created con el objeto real
-            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoPermiso);
-
-        } catch (IllegalArgumentException e) {
-            // ERROR DE CLIENTE: Formatos inválidos atrapados por tu DataValidator (HTTP 400 Bad Request)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-
+            return ResponseEntity.status(HttpStatus.CREATED).body(permisoService.crearPermiso(permiso));
         } catch (RuntimeException e) {
-            // ERROR DE NEGOCIO: Duplicidad en la base de datos MySQL (HTTP 409 Conflict)
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-
-        } catch (Exception e) {
-            // ERROR DEL SERVIDOR: Cualquier fallo inesperado en la infraestructura (HTTP 500)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error inesperado en el servidor al procesar el registro.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-}
-
-
-
-
-
-    // Actualizar permiso existente
-    @PutMapping("/actualizar")
-    public Permiso actualizarPermiso(@RequestBody Permiso permiso) {
-        return permisoService.crearPermiso(permiso);
     }
 
-    // Listar todos
+    // LISTAR
     @GetMapping("/listar")
-    public List<Permiso> listar() {
-        return permisoService.listarPermisos();
+    public ResponseEntity<?> listar() {
+        try {
+            return ResponseEntity.ok(permisoService.listarPermisos());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
-    // Buscar uno solo
-    @GetMapping("/buscar{id}")
-    public Permiso buscar(@PathVariable Integer id) {
-        return permisoService.buscarPorId(id);
+    // BUSCAR
+    @GetMapping("/buscar/{id}")
+    public ResponseEntity<?> buscar(@PathVariable Integer id) {
+        try {
+            return ResponseEntity.ok(permisoService.buscarPorId(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
-    // Eliminar
+    // ACTUALIZAR
+    @PutMapping("/actualizar")
+    public ResponseEntity<?> actualizar(@RequestBody Permiso permiso) {
+        try {
+            return ResponseEntity.ok(permisoService.actualizarPermiso(permiso));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    // ELIMINAR
     @DeleteMapping("/eliminar/{id}")
-    public void eliminar(@PathVariable Integer id) {
-        permisoService.eliminarPermiso(id);
+    public ResponseEntity<?> eliminar(@PathVariable Integer id) {
+        try {
+            permisoService.eliminarPermiso(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
-
 }

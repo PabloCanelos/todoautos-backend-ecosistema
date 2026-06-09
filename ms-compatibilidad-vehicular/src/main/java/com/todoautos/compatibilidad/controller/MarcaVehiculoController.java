@@ -24,7 +24,7 @@ public class MarcaVehiculoController {
             return ResponseEntity.ok(lista);
         } catch (RuntimeException e) {
             // Si la lista está vacía, devolvemos un mensaje claro
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 

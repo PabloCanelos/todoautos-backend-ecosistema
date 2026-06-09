@@ -28,10 +28,16 @@ public class ConfiguracionStockController {
     }
 
     // 2. LISTAR TODAS
+    // 2. LISTAR TODAS
     @GetMapping("/listar")
-    public ResponseEntity<List<ConfiguracionStockEntity>> listarConfiguraciones() {
-        List<ConfiguracionStockEntity> lista = configuracionService.listarConfiguraciones();
-        return ResponseEntity.ok(lista);
+    public ResponseEntity<?> listarConfiguraciones() {
+        try {
+            List<ConfiguracionStockEntity> lista = configuracionService.listarConfiguraciones();
+            return ResponseEntity.ok(lista);
+        } catch (RuntimeException e) {
+            // Esto captura la excepción "No hay configuraciones..." que lanzamos en el Service
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     // 3. BUSCAR POR ID

@@ -26,7 +26,7 @@ public class VersionMOtorController {
         try {
             return ResponseEntity.ok(versionMotorService.listarTodo());
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 

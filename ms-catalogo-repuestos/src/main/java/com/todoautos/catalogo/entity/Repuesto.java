@@ -21,7 +21,7 @@ public class Repuesto {
 
     // Relación: Muchos repuestos pertenecen a una categoría
     // Agregar fetch = FetchType.LAZY para evitar cargar la categoría siempre
-    @ManyToOne(fetch =  FetchType.LAZY)
+    @ManyToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name="idCategoria", nullable = false)// Obliga a que siempre haya una categoría
     @JsonIgnoreProperties("repuestos")
     private CategoriaRepuesto categoria;

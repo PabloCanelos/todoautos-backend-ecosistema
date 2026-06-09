@@ -17,8 +17,15 @@ public class ConfiguracionService {
 
     // Listar todas las configuraciones para que el Encargado de Bodega las supervise
     public List<ConfiguracionStockEntity> listarConfiguraciones() {
-        return configuracionRepository.findAll();
-    }
+        List<ConfiguracionStockEntity> lista = configuracionRepository.findAll();
+
+        // Validación profesional: Si no hay datos, lanzamos un error controlado
+        if (lista.isEmpty()) {
+            throw new RuntimeException("No hay configuraciones de stock registradas.");
+        }
+
+            return lista;
+        }
 
     public ConfiguracionStockEntity buscarPorId(Integer id) {
         if (id == null || id <= 0) {
@@ -46,6 +53,21 @@ public class ConfiguracionService {
 
     // Método exclusivo para AGREGAR (Crea algo nuevo)
     public ConfiguracionStockEntity agregarStock(ConfiguracionStockEntity nuevaConfig) {
+        // 1. Validar que el stock sea positivo
+        if (nuevaConfig.getStockMinimo() < 0 || nuevaConfig.getStockMaximo() < 0) {
+            throw new RuntimeException("Error: Los valores de stock no pueden ser negativos.");
+        }
+
+        // 2. Validar coherencia lógica
+        if (nuevaConfig.getStockMaximo() <= nuevaConfig.getStockMinimo()) {
+            throw new RuntimeException("Error: El stock máximo debe ser mayor al stock mínimo.");
+        }
+
+        // 3. (Opcional) Validar que el repuestoId sea válido
+        if (nuevaConfig.getRepuestoId() == null || nuevaConfig.getRepuestoId() <= 0) {
+            throw new RuntimeException("Error: Debe asociar un ID de repuesto válido.");
+        }
+
         nuevaConfig.setIdConfiguracion(null);
         return configuracionRepository.save(nuevaConfig);
     }

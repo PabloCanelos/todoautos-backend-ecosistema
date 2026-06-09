@@ -10,46 +10,63 @@ import com.todoautos.usuarios.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
+
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    //creacion nuevo usuario
-    public Usuario agregarUsuario(Usuario user){
-        if(user == null){
-            throw new RuntimeException("Error al registrar usuario");
+    public Usuario agregarUsuario(Usuario user) {
+        // Validación de datos básicos antes de guardar
+        if (user == null) {
+            throw new RuntimeException("Error: El usuario no puede ser nulo.");
         }
-        return usuarioRepository.save(user);
-
-    }
-
-    public List<Usuario> listarUsuario(){
-        return usuarioRepository.findAll();
-    }
-
-    //metodo para buscar por id
-
-    public Usuario buscarPorId(Integer id){
-        if(id== null){
-            throw new RuntimeException("Error: Id buscado no existe");
+        if (user.getNombreUsuario() == null || user.getNombreUsuario().isEmpty()) {
+            throw new RuntimeException("Error: El nombre de usuario es obligatorio.");
         }
-        return usuarioRepository.findById(id).orElse(null);
 
-    }
-
-    //ACTUALIZAR
-    public Usuario actualizarUsuario(Usuario user){
-        if(user == null){
-            throw new RuntimeException("El usuario que quiere actualizar no existe");
-        }
         return usuarioRepository.save(user);
     }
 
-    //METODO PARA ELIMINAR
-    public void eliminarUsuario(Integer id){
-        if(id == null){
-            throw new RuntimeException("Error: El Id que busca para eliminar no esta registrado en la base de datos");
+    public List<Usuario> listarUsuario() {
+        List<Usuario> lista = usuarioRepository.findAll();
+
+        // Validación de lista vacía
+        if (lista.isEmpty()) {
+            throw new RuntimeException("No hay usuarios registrados en el sistema.");
+        }
+
+        return lista;
+    }
+
+    public Usuario buscarPorId(Integer id) {
+        if (id == null || id <= 0) {
+            throw new RuntimeException("Error: El ID solicitado no es válido.");
+        }
+
+        return usuarioRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Error: Usuario con ID " + id + " no encontrado."));
+    }
+
+    public Usuario actualizarUsuario(Usuario user) {
+        if (user == null || user.getIdUsuario() == null) {
+            throw new RuntimeException("Error: El usuario o su ID no pueden ser nulos.");
+        }
+
+        // Verificamos existencia antes de intentar actualizar
+        Usuario usuarioExistente = usuarioRepository.findById(user.getIdUsuario())
+            .orElseThrow(() -> new RuntimeException("Error: No se encontró el usuario con ID: " + user.getIdUsuario()));
+
+        // Mapeo de campos
+        usuarioExistente.setNombreUsuario(user.getNombreUsuario());
+        usuarioExistente.setContraseñaUsuario(user.getContraseñaUsuario());
+        usuarioExistente.setRol(user.getRol());
+
+        return usuarioRepository.save(usuarioExistente);
+    }
+
+    public void eliminarUsuario(Integer id) {
+        if (id == null || !usuarioRepository.existsById(id)) {
+            throw new RuntimeException("Error: No se puede eliminar, el usuario con ID " + id + " no existe.");
         }
         usuarioRepository.deleteById(id);
-
     }
 }

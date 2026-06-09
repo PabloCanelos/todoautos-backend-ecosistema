@@ -1,6 +1,4 @@
 package com.todoautos.catalogo.controller;
-
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,53 +14,47 @@ public class CategoriaRepuestoController {
     @Autowired
     private CategoriaRepuestoService categoriaService;
 
-    // 1. AGREGAR
     @PostMapping("/agregar")
-    public ResponseEntity<?> guardarCategoria(@RequestBody CategoriaRepuesto categoria) {
-        try {
-            CategoriaRepuesto categoriaGuardada = categoriaService.guardarCategoria(categoria);
-            return ResponseEntity.status(HttpStatus.CREATED).body(categoriaGuardada);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<CategoriaRepuesto> guardarCategoria(@RequestBody CategoriaRepuesto categoria) {
+        // Sin try-catch, el GlobalExceptionHandler se encarga de los errores
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoriaService.guardarCategoria(categoria));
     }
 
-    // 2. BUSCAR POR ID
     @GetMapping("/buscar/{id}")
-    public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
+public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
+    try {
+        return ResponseEntity.ok(categoriaService.buscarPorId(id));
+    } catch (IllegalArgumentException e) {
+        // Esto captura los IDs inválidos (ej: -1, 0)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    } catch (RuntimeException e) {
+        // Esto captura cuando el ID no existe en la base de datos
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+}
+
+    @GetMapping("/listar")
+    public ResponseEntity<?> listarTodo() {
         try {
-            CategoriaRepuesto categoria = categoriaService.buscarPorId(id);
-            return ResponseEntity.ok(categoria);
+            return ResponseEntity.ok(categoriaService.listarTodo());
         } catch (RuntimeException e) {
+            // Retornamos 404 porque no se encontraron recursos
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
-
-    @GetMapping("/listar")
-    public ResponseEntity<List<CategoriaRepuesto>> listarTodo() {
-        List<CategoriaRepuesto> lista = categoriaService.listarTodo();
-        return ResponseEntity.ok(lista);
-    }
-
-    // 4. ACTUALIZAR
     @PutMapping("/actualizar")
-    public ResponseEntity<?> actualizarCategoria(@RequestBody CategoriaRepuesto categoria) {
-        try {
-            CategoriaRepuesto actualizada = categoriaService.actualizarCategoria(categoria);
-            return ResponseEntity.ok(actualizada);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<CategoriaRepuesto> actualizarCategoria(@RequestBody CategoriaRepuesto categoria) {
+        return ResponseEntity.ok(categoriaService.actualizarCategoria(categoria));
     }
 
-    // 5. ELIMINAR
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<?> eliminarCategoria(@PathVariable Integer id) {
+    public ResponseEntity<String> eliminarCategoria(@PathVariable Integer id) {
         try {
             categoriaService.eliminarCategoria(id);
             return ResponseEntity.ok("Categoría eliminada correctamente.");
         } catch (RuntimeException e) {
+            // En lugar de un 500, devolvemos un 404 Not Found con el mensaje de tu Service
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }

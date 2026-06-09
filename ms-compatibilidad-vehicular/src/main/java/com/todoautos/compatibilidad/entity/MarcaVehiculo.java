@@ -22,7 +22,7 @@ public class MarcaVehiculo {
 
     //RELACIÓN: Una Marca tiene muchos Modelos
     @OneToMany(mappedBy = "marcaVehiculo", cascade= CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference(value="marca-modelo")
     private List<ModeloVehiculo> modelos = new ArrayList<>();
     public MarcaVehiculo() {
         this.nombreMarcaVehiculo ="";
@@ -56,7 +56,7 @@ public class MarcaVehiculo {
         this.modelos = modelos;
     }
 
-    
+
 
 
 }

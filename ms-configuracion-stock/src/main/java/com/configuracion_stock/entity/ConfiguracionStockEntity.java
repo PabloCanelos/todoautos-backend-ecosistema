@@ -1,5 +1,4 @@
 package com.configuracion_stock.entity;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,10 +9,13 @@ public class ConfiguracionStockEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer idConfiguracion;
+
     private Integer stockMinimo;
+
     private Integer stockMaximo;
     private String observaciones;
-
+    //importacion
+    private Integer repuestoId;
 
     public ConfiguracionStockEntity() {
         this.stockMinimo =0;
@@ -61,7 +63,7 @@ public class ConfiguracionStockEntity {
         this.observaciones = observaciones;
     }
 
-/*
+
     public Integer getRepuestoId() {
         return repuestoId;
     }
@@ -70,7 +72,7 @@ public class ConfiguracionStockEntity {
     public void setRepuestoId(Integer repuestoId) {
         this.repuestoId = repuestoId;
     }
-*/
+
 
 
 
