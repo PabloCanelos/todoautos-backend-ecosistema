@@ -1,37 +1,35 @@
 package com.example.ms_movimientos_inventario.controller;
+
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import com.example.ms_movimientos_inventario.inventarioDTO.MovimientoInventarioDTO;
 import com.example.ms_movimientos_inventario.model.MovimientoInventario;
 import com.example.ms_movimientos_inventario.service.MovimientoInventarioService;
 
 @RestController
-@RequestMapping("/movimientos")
+@RequestMapping("/api/movimientos")
 public class MovimientoInventarioController {
 
     @Autowired
-    private MovimientoInventarioService movimientoInventarioService;
+    private MovimientoInventarioService movimientoService;
 
     @PostMapping("/guardar")
-    public MovimientoInventario guardar(@RequestBody MovimientoInventario movimiento){
-        return movimientoInventarioService.guardarMovimiento(movimiento);
+    public ResponseEntity<MovimientoInventario> guardar(@RequestBody MovimientoInventarioDTO dto) {
+        MovimientoInventario nuevoMovimiento = movimientoService.registrarMovimiento(dto);
+        return new ResponseEntity<>(nuevoMovimiento, HttpStatus.CREATED);
     }
 
     @GetMapping("/listar")
-    public List<MovimientoInventario> listar(){
-        return movimientoInventarioService.listarTodo();
+    public ResponseEntity<List<MovimientoInventario>> listar() {
+        return ResponseEntity.ok(movimientoService.listarTodo());
     }
 
     @GetMapping("/buscar/{id}")
-    public MovimientoInventario buscar(@PathVariable Integer id){
-        return movimientoInventarioService.buscarPorId(id);
+    public ResponseEntity<MovimientoInventario> buscarPorId(@PathVariable Integer id) {
+        MovimientoInventario movimiento = movimientoService.buscarPorId(id);
+        return (movimiento != null) ? ResponseEntity.ok(movimiento) : ResponseEntity.notFound().build();
     }
-
 }

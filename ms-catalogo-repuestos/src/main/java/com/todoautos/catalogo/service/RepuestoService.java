@@ -1,6 +1,7 @@
 package com.todoautos.catalogo.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,6 @@ public class RepuestoService {
 
     public Repuesto buscarPorId(Integer id) {
         if (id == null || id <= 0) throw new IllegalArgumentException("ID inválido: " + id);
-
         // Excepción específica para cuando algo no se encuentra (Not Found)
         return repuestoRepository.findById(id)
             .orElseThrow(() -> new java.util.NoSuchElementException("Repuesto con ID " + id + " no encontrado"));
@@ -41,19 +41,16 @@ public class RepuestoService {
     }
 
     public Repuesto actualizarRepuesto(Repuesto repuesto) {
-        // Validación de existencia primero
-        Repuesto existente = buscarPorId(repuesto.getIdRepuesto());
+        // 1. Buscamos si existe el repuesto original en la base de datos
+        Repuesto repuestoExistente = repuestoRepository.findById(repuesto.getIdRepuesto())
+                .orElseThrow(() -> new NoSuchElementException("Repuesto no encontrado"));
 
-        // Validaciones de datos
-        if (repuesto.getPrecioVentaRepuesto() != null && repuesto.getPrecioVentaRepuesto() < 0)
-            throw new IllegalArgumentException("El precio no puede ser negativo");
+        // 2. Actualizamos solo el stock (o los campos que necesites)
+        // Esto es más seguro que guardar el objeto que llega por red
+        repuestoExistente.setCantidadRepuesto(repuesto.getCantidadRepuesto());
 
-        // Actualización lógica
-        existente.setNombreRepuesto(repuesto.getNombreRepuesto());
-        existente.setPrecioVentaRepuesto(repuesto.getPrecioVentaRepuesto());
-        // ... setear el resto de campos
-
-        return repuestoRepository.save(existente);
+        // 3. Guardamos la entidad real que ya vive en nuestra BD
+        return repuestoRepository.save(repuestoExistente);
     }
 
     public void eliminarRepuesto(Integer id) {

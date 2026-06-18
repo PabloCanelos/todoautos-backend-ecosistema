@@ -65,4 +65,15 @@ public class ClienteService {
         }
         clienteRepository.deleteById(id);
     }
+
+    // PUENTE CON REST TEMPLATE PARA COMUINICACION CON MS EXTERNO...
+
+    public Cliente buscarPorRut(String rutCliente) {
+    if (rutCliente == null || rutCliente.trim().isEmpty()) {
+        throw new RuntimeException("Error: El RUT es obligatorio.");
+    }
+
+    // CAMBIO: Usamos .orElse(null) en lugar de .orElseThrow()
+    return clienteRepository.findByRutCliente(rutCliente).orElse(null);
+}
 }

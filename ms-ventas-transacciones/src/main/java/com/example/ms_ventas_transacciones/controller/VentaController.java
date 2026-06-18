@@ -20,8 +20,8 @@ public class VentaController {
     @Autowired
     private VentaService ventaService;
 
-    @PostMapping("/guardar")
-    public Venta guardar(@RequestBody Venta venta){
+    @PostMapping
+    public Venta crearVenta(@RequestBody Venta venta) {
         return ventaService.guardarVenta(venta);
     }
 
@@ -30,9 +30,9 @@ public class VentaController {
         return ventaService.listarVenta();
     }
 
-    @GetMapping("/buscar")
+    // CORRECCIÓN: Se agregó "/{id}" para que coincida con el @PathVariable
+    @GetMapping("/{id}")
     public Venta buscar(@PathVariable Integer id){
         return ventaService.buscarPorId(id);
     }
-
 }

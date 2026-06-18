@@ -1,46 +1,39 @@
 package com.example.ms_ventas_transacciones.model;
 
 import java.time.LocalDate;
-
-//import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-// import jakarta.persistence.JoinColumn;
-// import jakarta.persistence.OneToOne;
 
 @Entity
 public class Venta {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Hace que el ID sea autoincremental
     private Integer idVenta;
-    private LocalDate fechaVenta;
 
-    // @OneToOne
-    // @JoinColumn(name="idVenta")
-    // @JsonBackReference
-    // private DetalleVenta detalleVenta;
+    private LocalDate fechaVenta;
+    private String rutCliente;
+
+    // --- NUEVO CAMPO: FK hacia el catálogo ---
+    private Integer idRepuesto;
 
     public Venta() {
-
-        this.fechaVenta = LocalDate.now() ;
+        this.fechaVenta = LocalDate.now();
     }
 
-    public Integer getIdVenta() {
-        return idVenta;
-    }
+    // --- GETTERS Y SETTERS ---
 
-    public void setIdVenta(Integer idVenta) {
-        this.idVenta = idVenta;
-    }
+    public Integer getIdVenta() { return idVenta; }
+    public void setIdVenta(Integer idVenta) { this.idVenta = idVenta; }
 
-    public LocalDate getFechaVenta() {
-        return fechaVenta;
-    }
+    public LocalDate getFechaVenta() { return fechaVenta; }
+    public void setFechaVenta(LocalDate fechaVenta) { this.fechaVenta = fechaVenta; }
 
-    public void setFechaVenta(LocalDate fechaVenta) {
-        this.fechaVenta = fechaVenta;
-    }
+    public String getRutCliente() { return rutCliente; }
+    public void setRutCliente(String rutCliente) { this.rutCliente = rutCliente; }
 
-
+    public Integer getIdRepuesto() { return idRepuesto; }
+    public void setIdRepuesto(Integer idRepuesto) { this.idRepuesto = idRepuesto; }
 }

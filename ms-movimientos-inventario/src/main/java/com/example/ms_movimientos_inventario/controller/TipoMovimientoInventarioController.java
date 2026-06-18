@@ -1,42 +1,38 @@
 package com.example.ms_movimientos_inventario.controller;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import com.example.ms_movimientos_inventario.model.TipoMovimientoInventario;
 import com.example.ms_movimientos_inventario.service.TipoMovimientoInventarioService;
 
 @RestController
 @RequestMapping("/api/tipos-movimientos")
 public class TipoMovimientoInventarioController {
+
     @Autowired
-    private TipoMovimientoInventarioService tipoMovimientoInventarioService;
+    private TipoMovimientoInventarioService tipoService;
 
     @PostMapping("/guardar")
-    public TipoMovimientoInventario guardar(@RequestBody TipoMovimientoInventario tipoMovimiento){
-        return tipoMovimientoInventarioService.guardarTipoMovimiento(tipoMovimiento);
+    public ResponseEntity<TipoMovimientoInventario> guardar(@RequestBody TipoMovimientoInventario tipo) {
+        return ResponseEntity.ok(tipoService.guardarTipoMovimiento(tipo));
     }
 
     @GetMapping("/listar")
-    public List<TipoMovimientoInventario> listar(){
-        return tipoMovimientoInventarioService.listarTodo();
+    public ResponseEntity<List<TipoMovimientoInventario>> listar() {
+        return ResponseEntity.ok(tipoService.listarTodo());
     }
 
-    @GetMapping("/buscar")
-    public TipoMovimientoInventario buscar(@PathVariable Integer id){
-        return tipoMovimientoInventarioService.buscarPorId(id);
+    @GetMapping("/buscar/{id}")
+    public ResponseEntity<TipoMovimientoInventario> buscarPorId(@PathVariable Integer id) {
+        TipoMovimientoInventario tipo = tipoService.buscarPorId(id);
+        return (tipo != null) ? ResponseEntity.ok(tipo) : ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/eliminar/1{id}")
-    public void eliminar(@PathVariable Integer id){
-        tipoMovimientoInventarioService.eliminarTipoMovimiento(id);
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
+        tipoService.eliminarTipoMovimiento(id);
+        return ResponseEntity.noContent().build();
     }
-
-
-
 }

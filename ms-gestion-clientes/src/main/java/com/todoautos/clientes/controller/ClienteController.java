@@ -34,7 +34,7 @@ public class ClienteController {
         return ResponseEntity.ok(lista);
     }
 
-    // 3. BUSCAR POR ID 
+    // 3. BUSCAR POR ID
     @GetMapping("/buscar/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable Integer id) {
         try {
@@ -69,5 +69,23 @@ public class ClienteController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
+    }
+
+    //========================================================
+    /*
+    cOMUNICACION CON MS EXTERNO, este es euqe envia informacion al receptor ms-venta-transacciones
+*/
+    @GetMapping("/{rut}")
+    public ResponseEntity<?> obtenerPorRut(@PathVariable String rut) {
+        System.out.println("Buscando RUT: " + rut); // <-- MIRA LA CONSOLA
+        Cliente cliente = clienteService.buscarPorRut(rut);
+
+        if (cliente == null) {
+            System.out.println("El cliente NO fue encontrado en la BD");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe el cliente");
+        }
+
+        System.out.println("Cliente encontrado: " + cliente.getPrimerNombreCliente()); // <-- MIRA LA CONSOLA
+        return ResponseEntity.ok(cliente);
     }
 }
